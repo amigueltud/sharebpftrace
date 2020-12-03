@@ -1,0 +1,105 @@
+    1  apk add git
+    2  ps
+    3  df
+    4  ls /
+    5  mount Alpine
+    6  fdisk 
+    7  halt
+    8  cd sharebpftrace/
+    9  ls -ltr
+   10  cat Dockerfile_BUILD_v1 >>../pk.sh 
+   11  cd ..
+   12  vi pk.sh 
+   13  vim pk.sh 
+   14  ls -ltr
+   15  chmod +x pk.sh 
+   16  ./pk.sh 
+   17  vim pk.sh 
+   18  ./pk.sh 
+   19  vim pk.sh 
+   20  ./pk.sh 
+   21  vim pk.sh 
+   22  ./pk.sh 
+   23  ./pk.sh 
+   24  ./pk.sh |less
+   25  vi pk.sh 
+   26  ./pk.sh 
+   27  ./pk.sh |less
+   28  ./pk.sh 2>&1 |less
+   29  vi pk.sh 
+   30  ./pk.sh 
+   31  vi pk.sh 
+   32  ./pk.sh 
+   33  vi pk.sh 
+   34  ./pk.sh 2>&1 |less
+   35  vi pk.sh 
+   36  ./pk.sh 2>&1 |less
+   37  ./pk.sh 
+   38  ./pk.sh 
+   39  ./pk.sh 
+   40  cat sharebpftrace/Dockerfile_BUILD_v1 
+   41  git clone https://github.com/iovisor/bcc.git
+   42  mkdir bcc/build
+   43  cd bcc/build
+   44  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   45  make && make install && ldconfig
+   46  cd ~ 
+   47  grep llvm pk.sh 
+   48  apk add llvm
+   49  apk add llvm9
+   50  apk add llvm9-dev
+   51  apk add llvm9-static
+   52  apk add llvm9-libs
+   53  cd -
+   54  make && make install && ldconfig
+   55  grep head ~/pk.sh 
+   56  grep \# ~/pk.sh
+   57  apk add libelf
+   58  apk add libelf-static
+   59  apk add elfutils
+   60  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   61  grep perf ~/pk.sh 
+   62  apk add iperf
+   63  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   64  apk add netperf
+   65  apk list *luajit*
+   66  grep lua ~/pk.sh 
+   67  apk add luajit luajit-dev
+   68  apk list *liblua*
+   69  apk list *lua*
+   70  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   71  apk list *perf*
+   72  apk add iperf3
+   73  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   74  make
+   75  apk list *llvm*
+   76  apk list *llvm* |grep install
+   77  apk list *llvm* |grep install
+   78  apk list *llvm* |grep -v install
+   79  apk add llvm10-static
+   80  apk add llvm10-dev
+   81  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   82  make
+   83  grep bcc ~/pk.sh 
+   84  apk list *llvm9*
+   85  apk add llvm9-test-utils
+   86  apk add llvm10-test-utils
+   87  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   88  make
+   89  make clean
+   90  make
+   91  grep bcc ~/pk.sh 
+   92  apk list *bcc*
+   93  apk add bcc
+   94  cd ..
+   95  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   96  cd build/
+   97  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ../
+   98  make
+   99  apk list *adt*
+  100  apk list |grep -i adt
+  101  apk list |grep -i lvm
+  102  apk list |grep -i llvm
+  103  apk list |grep -i llvm
+  104  uname -a
+  105  history >~/sharebpftrace/alpine_virt_hist.txt
