@@ -1,0 +1,113 @@
+FROM alpine:3.12
+
+
+RUN apk add --no-cache \
+		ca-certificates
+
+# RUN apk add --no-cache gcc musl-dev
+
+# RUN set -eux; \
+RUN	apk add --virtual .build-deps \
+		bash sudo grep vim procps curl git wget \
+		mandoc man-pages \
+		coreutils grep sed lynx curl make autoconf \
+		;
+RUN	apk add .build-deps \
+		make gcc g++ gdb clang nasm pkgconf \
+		ncurses ncurses-dev ncurses-static ncurses-terminfo ncurses-terminfo-base \
+		musl-dev \
+		strace ltrace \
+		libxslt libxml2 libxml2-utils wxgtk wxgtk-dev wxgtk3 wxgtk3-dev \
+		openssl libssl1.1 openssh-client openssh-server \
+		# erlang-wx \
+		# fop \
+		# ant \
+		;
+
+# RUN	apk add --virtual .build-deps \
+# 		;
+
+WORKDIR /root
+RUN echo "export PS1='\u@\h:\w # '" >>.bashrc
+
+
+# SSH configs
+RUN mkdir /root/.ssh && \
+    chmod 700 /root/.ssh; \
+    touch /root/.ssh/authorized_keys && \
+    chmod 0600 /root/.ssh/authorized_keys; 
+ADD ./id_rsa.pub.mig /root/
+RUN cat /root/id_rsa.pub.* >>/root/.ssh/authorized_keys
+RUN chown root /root/.ssh/authorized_keys
+# RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config; \
+    # sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd; \
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin without-password/' /etc/ssh/sshd_config; \
+# RUN sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config; \
+    mkdir /run/sshd && chmod 700 /run/sshd
+RUN cd /etc/ssh/ && ssh-keygen -A
+
+# ERL
+COPY erl.23.1 /erl.23.1
+
+WORKDIR /erl.23.1
+
+RUN tar xzf otp_src_23.1.REN_BUILD_v1_MAKE_RELEASE_TESTS.tar.gz
+WORKDIR /erl.23.1/otp_src_23.1/
+RUN make install
+
+WORKDIR /usr/local
+RUN tar xzfk /erl.23.1/otp_doc_man_23.1.tar.gz man
+
+# WORKDIR /usr/local/lib/erlang
+# RUN mkdir html \
+# 	cd /usr/local/lib/erlang/html \
+# 	tar xzf /erl.23.1/otp_doc_html_23.1.tar.gz
+
+RUN apk add perf
+# RUN apk add bpftrace
+
+WORKDIR /erl.23.1/otp_src_23.1
+RUN echo "" >>~/.bashrc
+RUN echo "export ERL_TOP=`pwd`" >>~/.bashrc
+RUN echo 'alias ls="ls --color "' >>~/.bashrc
+
+RUN cd /etc/ssh/ && ssh-keygen -A
+
+WORKDIR /root
+# RUN apk add cmake bison binutils \
+	# llvm bcc bcc-dev bcc-static llvm9 llvm9-dev llvm9-static llvm9-libs \
+	# libelf libelf-static elfutils elfutils-dev elfutils-libelf \
+	# libbpf libbpf-dev fortify-headers build-base \
+	# clang-dev clang-static \
+	# cmake cmake-bash-completion \
+	# flex flex-libs flex-dev \
+	# libc6-compat \
+	# zlib-static
+
+## Install bpftrace
+RUN apk add musl ncurses-terminfo-base ncurses-libs readline bash elfutils elfutils-libelf \
+	libbpf libgcc libstdc++ bcc pkgconf bcc-dev bcc-static m4 bison binutils libmagic \
+	file gmp isl libgomp libatomic mpfr4 mpc1 gcc musl-dev libc-dev g++ make fortify-headers \
+	build-base libffi xz-libs libxml2 llvm9-libs clang-libs clang clang-dev clang-static \
+	libacl libbz2 expat lz4-libs zstd-libs libarchive ca-certificates nghttp2-libs libcurl \
+	rhash-libs libuv cmake cmake-bash-completion elfutils-dev flex flex-libs flex-dev pcre2 \
+	git libbpf-dev libc6-compat linux-headers llvm9 llvm9-dev llvm9-static gdbm sqlite-libs \
+	python3 zlib-dev zlib-static
+
+RUN git clone https://github.com/iovisor/bpftrace
+RUN mkdir bpftrace/build || ls -ld bpftrace/build
+WORKDIR /root/bpftrace/build
+RUN	cmake -DCMAKE_BUILD_TYPE=Release ../
+#  cd /root/bpftrace/build \
+RUN	make 
+#  cd /root/bpftrace/build \
+RUN	make install
+#  cd /root/bpftrace/build \
+
+WORKDIR /root
+RUN wget http://dl-cdn.alpinelinux.org/alpine/edge/testing/x86_64/mokutil-0.4.0-r1.apk
+RUN apk add mokutil-0.4.0-r1.apk
+
+
+#####
+CMD /bin/bash
