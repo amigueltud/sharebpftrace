@@ -1,0 +1,1 @@
+./configure --enable-dirty-schedulers --enable-plain-emulator --enable-kernel-poll
