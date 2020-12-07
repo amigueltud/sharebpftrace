@@ -1,0 +1,8 @@
+87993101.
+[{call_bm,{{"11.1","BEAM"},
+           [{local_call,75},
+            {external_call,62},
+            {fun_call,210},
+            {apply_fun,195},
+            {apply_mfa_implicit,68},
+            {apply_mfa_explicit,68}]}}].
