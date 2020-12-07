@@ -1,0 +1,226 @@
+application:start(sasl).
+application:start(os_mon).
+cpu_sup:util([per_cpu]).
+
+
+erl +A 10:1 +S 8:1
+erl +A 4:4 +S 8:8
+
+
+now().
+erlang:system_time().
+
+TC = fun(F) -> B = now(), V = F(), A = now(), {timer:now_diff(A,B), V} end.
+F = fun() -> primality:primality(100000) end.
+TC(F).
+
+f(TC).
+f(F).
+
+TC = fun(F(P)) -> B = now(), V = F(P), A = now(), {timer:now_diff(A,B)/1000/1000, V} end.
+F = fun(P) -> primality:primality(P) end.
+TC(F(10000)).
+
+TCN2 = fun(T,F,0) -> ok; (T,F,N) -> F(), T(T,F,N-1) end.
+TCN = fun(F,N) -> B=now(), TCN2(TCN2,F,N), A=now(), (timer:now_diff(A,B)/N)/1000/1000 end.
+TCN(F, 100).
+
+f(TCN2).
+f(TCN).
+
+%%%%%%%%%%%%
+TC = fun(F) -> B = now(), V = F(), A = now(), {timer:now_diff(A,B), V} end.
+F = fun() -> primality:primality(100000) end.
+TC(F).
+TCN2 = fun(T,F,0) -> ok; (T,F,N) -> F(), T(T,F,N-1) end.
+TCN = fun(F,N) -> B=now(), TCN2(TCN2,F,N), A=now(), (timer:now_diff(A,B)/N)/1000/1000 end.
+TCN(F, 10).
+
+
+erl -sname prime_checker
+
+
+
+
+%%%%%%%%%%%%%%%%%
+% 22/nov 12:30
+
+cd /erl.23.1/otp_src_23.1
+ls system/doc/
+ls system/doc/efficiency_guide/
+cd system/doc/efficiency_guide/
+
+cd /root
+mkdir BUILD_v1_efficiency_guide
+cd BUILD_v1_efficiency_guide
+cp -pRf /erl.23.1/otp_src_23.1/system/doc/efficiency_guide .
+mkdir bench
+cp efficiency_guide/*.erl efficiency_guide/*.hrl bench/
+cd bench/
+erlc *erl
+erl
+>>>>> Erlang/OTP 23 [erts-11.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1]
+bench:run().
+
+%%%%
+% 22/nov 17:04
+cd /erl.23.1/
+tar xzf otp_src_23.1.REN_BUILD_v1_MAKE_RELEASE_TESTS.tar.gz
+cd otp_*/
+make install
+cd /root/
+cp -pRf /test/COPYTO_vx_thread_creation_benchmark BUILD_v1_thread_creation_benchmark
+cd BUILD_v1_thread_creation_benchmark/
+(./bench_runone.sh >runone.erl_1_1.txt; ./bench_runone100000.sh >runone100000.erl_1_1.txt; ./bench_run100000one.sh >run100000one.erl_1_1.txt; ./bench_run100000100.sh >run100000100.erl_1_1.txt; ./bench_run10000010000.sh >run10000010000.erl_1_1.txt)
+for r in run*erl_1_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+(./bench_runone100000.sh >runone100000.erl_2_1.txt; ./bench_run100000one.sh >run100000one.erl_2_1.txt; ./bench_run100000100.sh >run100000100.erl_2_1.txt; ./bench_run10000010000.sh >run10000010000.erl_2_1.txt)
+for r in run*erl_2_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+(./bench_runone100000.sh >runone100000.erl_4_4.txt; ./bench_run100000one.sh >run100000one.erl_4_4.txt; ./bench_run100000100.sh >run100000100.erl_4_4.txt; ./bench_run10000010000.sh >run10000010000.erl_4_4.txt)
+for r in run*erl_4_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+
+
+%%%%
+% 23/nov 08:00
+cd /erl.23.1/
+tar xzf otp_src_23.1.REN_BUILD_v2_MAKE_RELEASE_TESTS.tar.gz
+cd otp_*/
+make install
+cd /root/
+cp -pRf /test/BUILD_v1_thread_creation_benchmark BUILD_v2_thread_creation_benchmark
+cd BUILD_v2_thread_creation_benchmark/
+(./bench_runone.sh >runone.erl_1_1.txt; ./bench_runone100000.sh >runone100000.erl_1_1.txt; ./bench_run100000one.sh >run100000one.erl_1_1.txt; ./bench_run100000100.sh >run100000100.erl_1_1.txt; ./bench_run10000010000.sh >run10000010000.erl_1_1.txt)
+for r in run*erl_1_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+(./bench_runone100000.sh >runone100000.erl_2_1.txt; ./bench_run100000one.sh >run100000one.erl_2_1.txt; ./bench_run100000100.sh >run100000100.erl_2_1.txt)
+for r in run*erl_2_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+(./bench_runone100000.sh >runone100000.erl_4_4.txt; ./bench_run100000one.sh >run100000one.erl_4_4.txt; ./bench_run100000100.sh >run100000100.erl_4_4.txt)
+for r in run*erl_4_*txt; do cat $r |grep ^[0-9] |awk -vr="$r" -F";" 'BEGIN{printf r "\t\t\t"; ct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct}'; done
+
+
+%%%%%%%%%%%%
+for r in run*erl_1_*txt; do th="$(echo $r |cut -d '.' -f 1 |sed 's/run100000//g; s/runone/1/g; s/11/1/g; s/one/1/g;')"; cat $r |grep ^[0-9] |awk -v r="$r" -v th="$th" -F";" 'BEGIN{printf r "\t\t\t"; bct=0; sum=0;} {ct++; sum+=($3/$2);} END{print "count:" ct, "sum:" sum, "avg:" sum/ct/th}'; done |sed 's/,/./g;'
+
+
+
+%%%%%%%%%%%%%%%
+% 30/11 11:00 - 12:00 - 18:00
+% editing specific Dockerfile for BUILD v1 and BUILD v2
+
+% tracing helloworld BUILD v1
+strace -s 120 -f -i -v -e 'trace=!nanosleep,futex,mmap,getpid,tgkill,brk,clock_gettime,arch_prctl,munmap,readlink,fstat,rt_sigaction,rt_sigprocmask,gettid,getpid,set_robust_list,sched_get_priority_min' -o helloworld.log erl -noshell -s helloworld start
+
+
+strace -s 120 -f -i -v -o helloworld.log erl -noshell -s helloworld start
+
+cat helloworld.log |egrep -w 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' |wc -l
+
+cat helloworld.log |egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' |wc -l
+
+cat helloworld.log |egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' >helloworld.log.filter
+
+
+# BUILD v1
+strace -ttt -T -wC -s 120 -f -i -v erl +S 1:1 +A 1 -noshell -s helloworld start
+
+strace -s 120 -f -i -v -o helloworld.build_v1.s1a1.log erl +S 1:1 +A 1 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v1.s1a1.log |cat -n >helloworld.build_v1.s1a1.log.filter.line.log
+_pids=""; cat helloworld.build_v1.s1a1.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v1.s1a1.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+strace -s 120 -f -i -v -o helloworld.build_v1.s2a1.log erl +S 2:2 +A 1 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v1.s2a1.log |cat -n >helloworld.build_v1.s2a1.log.filter.line.log
+_pids=""; cat helloworld.build_v1.s2a1.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v1.s2a1.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+strace -s 120 -f -i -v -o helloworld.build_v1.s4a4.log erl +S 4:4 +A 4 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v1.s4a4.log |cat -n >helloworld.build_v1.s4a4.log.filter.line.log
+_pids=""; cat helloworld.build_v1.s4a4.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v1.s4a4.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+
+
+
+
+%%%%%%%%%%%%%%%
+% 01/12 11:00 - 10:00 - 
+% tracing helloworld BUILD v2
+strace -s 120 -f -i -v -e 'trace=!nanosleep,futex,mmap,getpid,tgkill,brk,clock_gettime,arch_prctl,munmap,readlink,fstat,rt_sigaction,rt_sigprocmask,gettid,getpid,set_robust_list,sched_get_priority_min' -o helloworld.log erl -noshell -s helloworld start
+
+
+# BUILD v2
+rm helloworld.beam
+erlc helloworld.erl
+
+strace -s 120 -f -i -v -o helloworld.build_v2.s1a1.log erl +S 1:1 +A 1 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v2.s1a1.log |cat -n >helloworld.build_v2.s1a1.filter.line.log
+_pids=""; cat helloworld.build_v2.s1a1.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v2.s1a1.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+strace -s 120 -f -i -v -o helloworld.build_v2.s2a1.log erl +S 2:2 +A 1 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v2.s2a1.log |cat -n >helloworld.build_v2.s2a1.filter.line.log
+_pids=""; cat helloworld.build_v2.s2a1.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v2.s2a1.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+strace -s 120 -f -i -v -o helloworld.build_v2.s4a4.log erl +S 4:4 +A 4 -noshell -s helloworld start
+egrep -vw 'nanosleep|futex|mmap|getpid|tgkill|brk|clock_gettime|arch_prctl|munmap|readlink|fstat|rt_sigaction|rt_sigprocmask|gettid|getpid|set_robust_list|sched_get_priority_min' helloworld.build_v2.s4a4.log |cat -n >helloworld.build_v2.s4a4.filter.line.log
+_pids=""; cat helloworld.build_v2.s4a4.log |awk '{print $1}' |sort -u |while read _pid; do _pids="$_pids|$_pid"; done; egrep -w "$_pids" helloworld.build_v2.s4a4.filter.line.log |egrep --color 'fork\(|fork.*resumed|execve\(|clone\(|exited with|clone resumed|kill\(|kill resumed|killed by|writev.*Hello'
+
+
+
+wc -l helloworld.build_v?.s?a?.log
+  15590 helloworld.build_v1.s1a1.log
+  15954 helloworld.build_v1.s2a1.log
+  17936 helloworld.build_v1.s4a4.log
+  12554 helloworld.build_v2.s1a1.log
+  14377 helloworld.build_v2.s2a1.log
+  16867 helloworld.build_v2.s4a4.log
+
+
+_strace_log=helloworld.build_v1.s1a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+_strace_log=helloworld.build_v1.s2a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+_strace_log=helloworld.build_v1.s4a4.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+_strace_log=helloworld.build_v2.s1a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+_strace_log=helloworld.build_v2.s2a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+_strace_log=helloworld.build_v2.s4a4.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep -c "^$_pid.*\] .*[a-z]("; done
+
+
+
+
+_strace_log=helloworld.build_v1.s1a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+_strace_log=helloworld.build_v1.s2a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+_strace_log=helloworld.build_v1.s4a4.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+_strace_log=helloworld.build_v2.s1a1.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+_strace_log=helloworld.build_v2.s2a1.log; cat $_strace_log |awk '{print $1}' |sort -un |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+_strace_log=helloworld.build_v2.s4a4.log; cat $_strace_log |awk '{print $1}' |sort -u |while read _pid; do printf "$_pid: "; cat $_strace_log |awk -v _pid="$_pid" '{if($1 == _pid) print $0;}' |grep "^$_pid.*\] [a-z].*(" |awk '{print $3}' |grep "(" |cut -d '(' -f 1 |wc -l; done
+
+for syscall in fork execve clone exit exit_group kill writev; do echo $syscall; grep -c --color "$syscall(" $_strace_log; done
+
+
+
+
+%%%%%%%%%%%%%%%%%%%
+% 02/12 10:00 - 
